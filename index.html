@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumina | Modern Course Management System</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6', // Brand Blue
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        },
+                        slate: {
+                            850: '#151e2e', // Custom dark for sidebar
+                        },
+                        emerald: {
+                            500: '#10b981', // Success
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.4s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <script src="https://unpkg.com/recharts/umd/Recharts.js"></script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased h-screen overflow-hidden">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+        const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } = Recharts;
+
+        // --- ICONS (Lucide style) ---
+        const Icon = ({ name, size = 20, className = "" }) => {
+            const icons = {
+                layout: <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" />,
+                bookOpen: <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />,
+                users: <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M16 3.13a4 4 0 0 1 0 7.75 M23 21v-2a4 4 0 0 0-3-3.87" />,
+                settings: <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />,
+                check: <polyline points="20 6 9 17 4 12" />,
+                plus: <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />,
+                moreVertical: <circle cx="12" cy="12" r="1" /><circle cx="12" cy="5" r="1" /><circle cx="12" cy="19" r="1" />,
+                search: <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />,
+                bell: <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" />,
+                playCircle: <circle cx="12" cy="12" r="10" /><polygon points="10 8 16 12 10 16 10 8" />,
+                fileText: <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" />
+            };
+
+            return (
+                <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    width={size} 
+                    height={size} 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    className={className}
+                >
+                    {icons[name] || <circle cx="12" cy="12" r="10" />}
+                </svg>
+            );
+        };
+
+        // --- MOCK DATA ---
+        const COURSES = [
+            { id: 1, title: 'Advanced React Design Patterns', instructor: 'Sarah Drasner', progress: 75, image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', color: 'bg-blue-100 text-blue-600' },
+            { id: 2, title: 'Full-Stack Next.js Architecture', instructor: 'Lee Robinson', progress: 30, image: 'https://images.unsplash.com/photo-1618477247222-ac591245363d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', color: 'bg-purple-100 text-purple-600' },
+            { id: 3, title: 'UI/UX Principles for Devs', instructor: 'Gary Simon', progress: 0, image: 'https://images.unsplash.com/photo-1586717791821-3f44a5638d4f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', color: 'bg-emerald-100 text-emerald-600' },
+        ];
+
+        const STUDENTS = [
+            { id: 1, name: 'Alice Freeman', email: 'alice@example.com', enrolled: 4, avg: 92 },
+            { id: 2, name: 'Bob Smith', email: 'bob@example.com', enrolled: 2, avg: 85 },
+            { id: 3, name: 'Charlie Kim', email: 'charlie@example.com', enrolled: 5, avg: 78 },
+            { id: 4, name: 'Diana Prince', email: 'diana@example.com', enrolled: 3, avg: 98 },
+        ];
+
+        // --- ATOMIC COMPONENTS ---
+
+        const Button = ({ children, variant = 'primary', className = "", onClick, icon }) => {
+            const base = "inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed";
+            const variants = {
+                primary: "bg-primary-600 hover:bg-primary-700 text-white shadow-md shadow-primary-500/20 focus:ring-primary-500 active:scale-95",
+                secondary: "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 focus:ring-slate-200",
+                ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
+                accent: "bg-emerald-500 hover:bg-emerald-600 text-white shadow-md shadow-emerald-500/20 active:scale-95"
+            };
+
+            return (
+                <button className={`${base} ${variants[variant]} ${className}`} onClick={onClick}>
+                    {icon && <span className="mr-2">{icon}</span>}
+                    {children}
+                </button>
+            );
+        };
+
+        const Card = ({ children, className = "" }) => (
+            <div className={`bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden ${className}`}>
+                {children}
+            </div>
+        );
+
+        const Badge = ({ children, color = "blue" }) => {
+            const colors = {
+                blue: "bg-blue-50 text-blue-700 border-blue-100",
+                green: "bg-emerald-50 text-emerald-700 border-emerald-100",
+                gray: "bg-slate-100 text-slate-700 border-slate-200"
+            };
+            return (
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${colors[color]}`}>
+                    {children}
+                </span>
+            );
+        };
+
+        const ProgressBar = ({ progress, className = "" }) => (
+            <div className={`w-full bg-slate-100 rounded-full h-2 ${className}`}>
+                <div 
+                    className="bg-primary-500 h-2 rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(59,130,246,0.5)]" 
+                    style={{ width: `${progress}%` }}
+                ></div>
+            </div>
+        );
+
+        const Skeleton = ({ className = "" }) => (
+            <div className={`animate-pulse bg-slate-200 rounded ${className}`}></div>
+        );
+
+        // --- COMPOUND COMPONENTS ---
+
+        const SidebarLink = ({ icon, label, active, onClick }) => (
+            <button 
+                onClick={onClick}
+                className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors mb-1
+                ${active ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+            >
+                <Icon name={icon} size={18} className={`mr-3 ${active ? 'text-primary-600' : 'text-slate-400'}`} />
+                {label}
+            </button>
+        );
+
+        const Header = ({ title, userRole, setRole }) => (
+            <header className="h-16 border-b border-slate-200 bg-white/80 backdrop-blur-md sticky top-0 z-10 px-8 flex items-center justify-between">
+                <h1 className="text-xl font-bold text-slate-800 tracking-tight">{title}</h1>
+                
+                <div className="flex items-center space-x-6">
+                    <div className="relative hidden md:block">
+                        <Icon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                        <input 
+                            type="text" 
+                            placeholder="Search..." 
+                            className="pl-9 pr-4 py-1.5 text-sm border border-slate-200 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all w-64"
+                        />
+                    </div>
+                    
+                    <button className="relative text-slate-500 hover:text-slate-700">
+                        <Icon name="bell" size={20} />
+                        <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+                    </button>
+
+                    <div className="h-8 w-px bg-slate-200 mx-2"></div>
+
+                    {/* Role Switcher for Demo Purposes */}
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs text-slate-400 uppercase font-semibold">View as:</span>
+                        <select 
+                            value={userRole} 
+                            onChange={(e) => setRole(e.target.value)}
+                            className="text-sm font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-md py-1 px-2 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                        >
+                            <option value="student">Student</option>
+                            <option value="instructor">Instructor</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+
+                    <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-primary-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold ring-2 ring-white shadow-sm">
+                        JD
+                    </div>
+                </div>
+            </header>
+        );
+
+        // --- VIEWS ---
+
+        const StudentDashboard = () => {
+            const [loading, setLoading] = useState(true);
+
+            useEffect(() => {
+                setTimeout(() => setLoading(false), 800);
+            }, []);
+
+            if (loading) {
+                return (
+                    <div className="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="bg-white rounded-xl border border-slate-200 p-4 h-64 flex flex-col justify-between">
+                                <Skeleton className="h-32 w-full rounded-lg" />
+                                <div className="space-y-2">
+                                    <Skeleton className="h-4 w-3/4" />
+                                    <Skeleton className="h-4 w-1/2" />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                );
+            }
+
+            return (
+                <div className="p-8 animate-fade-in">
+                    <div className="mb-8">
+                        <h2 className="text-2xl font-bold text-slate-800">Welcome back, John!</h2>
+                        <p className="text-slate-500">You have 2 assignments due this week.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {COURSES.map(course => (
+                            <Card key={course.id} className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer">
+                                <div className="relative h-40 overflow-hidden">
+                                    <img src={course.image} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                    <div className="absolute top-3 right-3">
+                                        <Badge color={course.progress === 100 ? 'green' : 'blue'}>
+                                            {course.progress === 0 ? 'Not Started' : course.progress === 100 ? 'Completed' : 'In Progress'}
+                                        </Badge>
+                                    </div>
+                                </div>
+                                <div className="p-5">
+                                    <h3 className="font-bold text-lg text-slate-800 mb-1">{course.title}</h3>
+                                    <p className="text-sm text-slate-500 mb-4 flex items-center">
+                                        <Icon name="users" size={14} className="mr-1.5" />
+                                        {course.instructor}
+                                    </p>
+                                    
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between text-xs font-medium text-slate-600">
+                                            <span>Progress</span>
+                                            <span>{course.progress}%</span>
+                                        </div>
+                                        <ProgressBar progress={course.progress} />
+                                    </div>
+
+                                    <div className="mt-5 pt-4 border-t border-slate-100 flex justify-between items-center">
+                                        <span className="text-xs text-slate-400">Next: Module 3.2</span>
+                                        <Button variant="secondary" className="!py-1.5 !px-3 !text-xs">
+                                            Resume
+                                        </Button>
+                                    </div>
+                                </div>
+                            </Card>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        const InstructorDashboard = () => {
+            const [activeTab, setActiveTab] = useState('overview');
+
+            // Mock Chart Data
+            const data = [
+                { name: 'Mon', students: 40 },
+                { name: 'Tue', students: 30 },
+                { name: 'Wed', students: 60 },
+                { name: 'Thu', students: 45 },
+                { name: 'Fri', students: 80 },
+            ];
+
+            return (
+                <div className="p-8 animate-fade-in space-y-8">
+                    {/* Stats Row */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <Card className="p-6 flex items-start justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-slate-500">Total Students</p>
+                                <h3 className="text-3xl font-bold text-slate-800 mt-1">1,248</h3>
+                                <p className="text-xs text-emerald-600 mt-1 flex items-center">
+                                    <Icon name="plus" size={12} className="mr-1" /> 12% from last month
+                                </p>
+                            </div>
+                            <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
+                                <Icon name="users" size={24} />
+                            </div>
+                        </Card>
+                        <Card className="p-6 flex items-start justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-slate-500">Average Grade</p>
+                                <h3 className="text-3xl font-bold text-slate-800 mt-1">88.4%</h3>
+                                <p className="text-xs text-slate-400 mt-1">Consistent with avg</p>
+                            </div>
+                            <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
+                                <Icon name="check" size={24} />
+                            </div>
+                        </Card>
+                        <Card className="p-6 flex items-start justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-slate-500">Active Courses</p>
+                                <h3 className="text-3xl font-bold text-slate-800 mt-1">8</h3>
+                                <p className="text-xs text-slate-400 mt-1">2 Pending Review</p>
+                            </div>
+                            <div className="p-3 bg-purple-50 text-purple-600 rounded-lg">
+                                <Icon name="bookOpen" size={24} />
+                            </div>
+                        </Card>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        {/* Main Content Area (Chart & Students) */}
+                        <div className="lg:col-span-2 space-y-8">
+                            <Card className="p-6">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className="font-bold text-slate-800">Student Engagement</h3>
+                                    <select className="text-sm border-none bg-slate-50 rounded-md px-2 py-1 text-slate-600 focus:ring-0">
+                                        <option>This Week</option>
+                                    </select>
+                                </div>
+                                <div className="h-64 w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={data}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
+                                            <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
+                                            <Tooltip 
+                                                cursor={{fill: '#f1f5f9'}}
+                                                contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}
+                                            />
+                                            <Bar dataKey="students" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={40} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </Card>
+
+                            <Card>
+                                <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                                    <h3 className="font-bold text-slate-800">Recent Enrollments</h3>
+                                    <Button variant="ghost" className="!text-xs">View All</Button>
+                                </div>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-sm text-left">
+                                        <thead className="text-xs text-slate-500 uppercase bg-slate-50/50">
+                                            <tr>
+                                                <th className="px-6 py-3 font-medium">Student</th>
+                                                <th className="px-6 py-3 font-medium">Course</th>
+                                                <th className="px-6 py-3 font-medium">Progress</th>
+                                                <th className="px-6 py-3 font-medium text-right">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {STUDENTS.map((student, idx) => (
+                                                <tr key={student.id} className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors">
+                                                    <td className="px-6 py-4 font-medium text-slate-900">{student.name}</td>
+                                                    <td className="px-6 py-4 text-slate-500">React Advanced</td>
+                                                    <td className="px-6 py-4">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-xs font-medium">{student.avg}%</span>
+                                                            <div className="w-16 bg-slate-100 rounded-full h-1.5">
+                                                                <div className="bg-emerald-500 h-1.5 rounded-full" style={{width: `${student.avg}%`}}></div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-right">
+                                                        <button className="text-slate-400 hover:text-primary-600">
+                                                            <Icon name="moreVertical" size={16} />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </Card>
+                        </div>
+
+                        {/* Course Builder Sidebar (Mini) */}
+                        <Card className="p-0 h-fit sticky top-24">
+                            <div className="p-5 border-b border-slate-100 bg-slate-50/50">
+                                <h3 className="font-bold text-slate-800">Course Builder</h3>
+                                <p className="text-xs text-slate-500 mt-1">Drag modules to reorder</p>
+                            </div>
+                            <div className="p-4 space-y-3">
+                                {[
+                                    { type: 'video', title: 'Introduction to Hooks', time: '12:00' },
+                                    { type: 'doc', title: 'Reading: State Logic', time: '5 min' },
+                                    { type: 'quiz', title: 'Quiz: useEffect', time: '10 pts' },
+                                    { type: 'video', title: 'Custom Hooks', time: '15:40' },
+                                ].map((module, i) => (
+                                    <div key={i} className="group flex items-center p-3 bg-white border border-slate-200 rounded-lg shadow-sm hover:border-primary-300 hover:shadow-md cursor-grab active:cursor-grabbing transition-all">
+                                        <div className="mr-3 text-slate-300 group-hover:text-primary-400">
+                                            <Icon name="moreVertical" size={16} />
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-2 mb-0.5">
+                                                <Icon name={module.type === 'video' ? 'playCircle' : module.type === 'doc' ? 'fileText' : 'check'} size={14} className="text-slate-400" />
+                                                <p className="text-sm font-medium text-slate-700">{module.title}</p>
+                                            </div>
+                                            <p className="text-xs text-slate-400 pl-6">{module.time}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                                <Button variant="secondary" className="w-full mt-4 border-dashed !text-slate-500">
+                                    <Icon name="plus" size={16} className="mr-2" /> Add Module
+                                </Button>
+                            </div>
+                        </Card>
+                    </div>
+                </div>
+            );
+        };
+
+        const AdminPanel = () => (
+            <div className="p-8 text-center text-slate-500">
+                <div className="max-w-md mx-auto mt-20">
+                    <div className="bg-slate-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Icon name="settings" size={32} className="text-slate-400" />
+                    </div>
+                    <h2 className="text-xl font-bold text-slate-800 mb-2">Admin Panel</h2>
+                    <p>This view shares components with the Instructor dashboard but includes User Management tables and Site Settings.</p>
+                </div>
+            </div>
+        );
+
+        // --- MAIN APP ---
+
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('dashboard');
+            const [userRole, setUserRole] = useState('student'); // student, instructor, admin
+
+            // Reset navigation when role changes
+            useEffect(() => {
+                setActiveTab('dashboard');
+            }, [userRole]);
+
+            const renderContent = () => {
+                if (activeTab === 'dashboard') {
+                    if (userRole === 'student') return <StudentDashboard />;
+                    if (userRole === 'instructor') return <InstructorDashboard />;
+                    if (userRole === 'admin') return <AdminPanel />;
+                }
+                return <div className="p-8 text-slate-500">Placeholder for {activeTab}...</div>;
+            };
+
+            const navItems = useMemo(() => {
+                const common = [{ id: 'dashboard', label: 'Dashboard', icon: 'layout' }];
+                if (userRole === 'student') {
+                    return [...common, { id: 'courses', label: 'My Courses', icon: 'bookOpen' }, { id: 'calendar', label: 'Schedule', icon: 'bell' }];
+                }
+                return [...common, { id: 'students', label: 'Students', icon: 'users' }, { id: 'courses', label: 'Course Catalog', icon: 'bookOpen' }, { id: 'settings', label: 'Settings', icon: 'settings' }];
+            }, [userRole]);
+
+            return (
+                <div className="flex h-screen bg-[#F8FAFC]">
+                    {/* Sidebar */}
+                    <aside className="w-64 bg-white border-r border-slate-200 flex flex-col hidden md:flex z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+                        <div className="h-16 flex items-center px-6 border-b border-slate-100">
+                            <div className="h-8 w-8 bg-primary-600 rounded-lg flex items-center justify-center mr-3 text-white font-bold">L</div>
+                            <span className="text-lg font-bold text-slate-800 tracking-tight">Lumina</span>
+                        </div>
+
+                        <div className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+                            <p className="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 mt-2">Menu</p>
+                            {navItems.map(item => (
+                                <SidebarLink 
+                                    key={item.id}
+                                    icon={item.icon} 
+                                    label={item.label} 
+                                    active={activeTab === item.id} 
+                                    onClick={() => setActiveTab(item.id)}
+                                />
+                            ))}
+                        </div>
+
+                        <div className="p-4 border-t border-slate-100">
+                            <div className="bg-slate-50 rounded-lg p-4">
+                                <p className="text-xs font-medium text-slate-500 mb-2">Storage Used</p>
+                                <ProgressBar progress={75} className="!h-1.5 mb-2" />
+                                <p className="text-xs text-slate-400">7.5GB of 10GB</p>
+                            </div>
+                        </div>
+                    </aside>
+
+                    {/* Main Content */}
+                    <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+                        <Header 
+                            title={activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} 
+                            userRole={userRole}
+                            setRole={setUserRole}
+                        />
+                        <div className="flex-1 overflow-auto scroll-smooth">
+                            <div className="max-w-7xl mx-auto w-full">
+                                {renderContent()}
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
