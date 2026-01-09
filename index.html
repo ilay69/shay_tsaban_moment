@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>מבוא למערכות מידע וניהול נתונים</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f4f6f9;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    header {
+      background: linear-gradient(to right, #2c3e50, #4a6491);
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 1rem;
+      font-weight: bold;
+    }
+
+    .hero {
+      background-image: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-4.0.3');
+      background-size: cover;
+      background-position: center;
+      height: 70vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-align: center;
+      padding: 2rem;
+      background-blend-mode: overlay;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      max-width: 700px;
+    }
+
+    section {
+      padding: 4rem 2rem;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #2c3e50;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+    }
+
+    .card {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    footer {
+      background: #2c3e50;
+      color: white;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2rem;
+      }
+      nav a {
+        margin-left: 0.5rem;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h2>קורס מבוא למערכות מידע וניהול נתונים</h2>
+  <nav>
+    <a href="#home">בית</a>
+    <a href="#about">על הקורס</a>
+    <a href="#content">תוכן הלימוד</a>
+    <a href="#trends">מגמות</a>
+    <a href="#contact">צור קשר</a>
+  </nav>
+</header>
+
+<section id="home" class="hero">
+  <h1>היכנס לעולם של ניהול נתונים ומערכות מידע</h1>
+  <p>קורס מקיף ומתקדם שמתאים למתחילים ומנוסים כאחד – עם דגש על טכנולוגיות מודרניות, ניתוח נתונים, אבטחת מידע ומערכות חכמות.</p>
+</section>
+
+<section id="about">
+  <h2>על הקורס</h2>
+  <div class="cards">
+    <div class="card">
+      <h3>מי הקורס מיועד?</h3>
+      <p>סטודנטים, אנשי מקצוע מתחילים, ומנהלי פרויקטים שמעוניינים להעמיק את הידע במערכות מידע וניהול נתונים.</p>
+    </div>
+    <div class="card">
+      <h3>מה תלמדו?</h3>
+      <p>מבנה ותפעול של מערכות מידע, בסיסי נתונים, SQL, NoSQL, אבטחת מידע, ניתוח נתונים והצגת מידע.</p>
+    </div>
+    <div class="card">
+      <h3>איך זה עובד?</h3>
+      <p>שילוב של הרצאות, סדנאות, פרויקטים מעשיים, ועבודה מול أدوات אמיתיות כמו Power BI, Tableau, MySQL ועוד.</p>
+    </div>
+  </div>
+</section>
+
+<section id="content">
+  <h2>תוכן הלימוד</h2>
+  <ul style="list-style-type:disc; padding-right: 2rem;">
+    <li><strong>הקדמה:</strong> מהי מערכת מידע? תפקידה בארגון</li>
+    <li><strong>בסיסי נתונים:</strong> מבנה טבלאות, מפתחות, קשרים</li>
+    <li><strong>שפות שאילתות:</strong> SQL ו-NoSQL</li>
+    <li><strong>אבטחת מידע:</strong> הגנה על נתונים ומדיניות פרטיות</li>
+    <li><strong>ניתוח נתונים:</strong> שימוש בכלי BI ויצירת דשבורדים</li>
+    <li><strong>מגמות טכנולוגיות:</strong> AI, Big Data, Cloud Computing</li>
+  </ul>
+</section>
+
+<section id="trends">
+  <h2>מגמות מודרניות בתחום</h2>
+  <div class="cards">
+    <div class="card">
+      <h3>אינטליגנציה המלאכותית</h3>
+      <p>AI משמשת לניתוח נתונים, זיהוי תבניות וקבלת החלטות אוטומטיות.</p>
+    </div>
+    <div class="card">
+      <h3>ענן וחישוב מבוזר</h3>
+      <p>אחסון ועיבוד נתונים בענן מאפשר גמישות, קנה מידה ויעילות.</p>
+    </div>
+    <div class="card">
+      <h3>אבטחת מידע ופרטיות</h3>
+      <p>GDPR, הצפנה, אימות דו-שלבי והגנת נתונים הם חלק בלתי נפרד מהמערכת.</p>
+    </div>
+    <div class="card">
+      <h3>Big Data</h3>
+      <p>עיבוד כמויות עצומות של נתונים לצורך תובנות עסקיות有价值.</p>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <h2>צור קשר</h2>
+  <p style="text-align:center;">רוצה להירשם או לקבל מידע נוסף? השאר פרטים ונחזור אליך בהקדם!</p>
+  <form style="max-width:600px;margin:auto;padding:2rem;background:white;border-radius:10px;box-shadow:0 4px 8px rgba(0,0,0,0.1);">
+    <input type="text" placeholder="שם מלא" style="width:100%;padding:0.8rem;margin-bottom:1rem;border:1px solid #ccc;border-radius:5px;" required />
+    <input type="email" placeholder="אימייל" style="width:100%;padding:0.8rem;margin-bottom:1rem;border:1px solid #ccc;border-radius:5px;" required />
+    <textarea placeholder="הודעה" rows="4" style="width:100%;padding:0.8rem;margin-bottom:1rem;border:1px solid #ccc;border-radius:5px;"></textarea>
+    <button type="submit" style="background:#4a6491;color:white;padding:0.8rem 2rem;border:none;border-radius:5px;font-weight:bold;">שלח</button>
+  </form>
+</section>
+
+<footer>
+  <p>&copy; 2025 קורס "מבוא למערכות מידע וניהול נתונים". כל הזכויות שמורות.</p>
+</footer>
+
+<script>
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        window.scrollTo({
+          top: target.offsetTop - 80,
+          behavior: 'smooth'
+        });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
